@@ -12,11 +12,23 @@ concourse:
             concourse-worker:
               image: 'eu.gcr.io/gardener-project/test/concourse-worker'
               dockerfile: concourse-worker.dockerfile
+              build_args:
+                # see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
+                cni_plugins_version: '0.8.7'
+                concourse_docker_entrypoint_commit_id: '486894e6d6f84aad112c14094bca18bec8c48154'
+                concourse_version: '7.9.0'
+                guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
             concourse-web:
               image: 'eu.gcr.io/gardener-project/test/concourse-web'
               dockerfile: concourse-web.dockerfile
               platforms:
                 - linux/amd64
+              build_args:
+                # see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
+                cni_plugins_version: '0.8.7'
+                concourse_docker_entrypoint_commit_id: '486894e6d6f84aad112c14094bca18bec8c48154'
+                concourse_version: '7.9.0'
+                guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
             concourse-resource-git:
               image: 'eu.gcr.io/gardener-project/test/concourse-resource-git'
               dockerfile: concourse-resource-git.dockerfile
