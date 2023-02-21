@@ -1,0 +1,25 @@
+concourse:
+  jobs:
+    head-update:
+      traits:
+        version: ~
+        publish:
+          platforms:
+            - linux/arm64
+            - linux/amd64
+          oci-builder: 'docker-buildx'
+          dockerimages:
+            concourse-worker:
+              image: 'eu.gcr.io/gardener-project/test/concourse-worker'
+              dockerfile: concourse-worker.dockerfile
+            concourse-web:
+              image: 'eu.gcr.io/gardener-project/test/concourse-web'
+              dockerfile: concourse-web.dockerfile
+              platforms:
+                - linux/amd64
+            concourse-resource-git:
+              image: 'eu.gcr.io/gardener-project/test/concourse-resource-git'
+              dockerfile: concourse-resource-git.dockerfile
+            concourse-resource-time:
+              image: 'eu.gcr.io/gardener-project/test/concourse-resource-time'
+              dockerfile: concourse-resource-time.dockerfile
