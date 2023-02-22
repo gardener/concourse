@@ -11,10 +11,6 @@ else
   build_dir="${own_dir}"
 fi
 
-if [ ! -z "${DOCKERFILE:-}" ]; then
-  dockerfile="${DOCKERFILE}"
-fi
-
 outdir="${build_dir}/resource-types"
 
 mkdir -p "${outdir}/registry-image"
