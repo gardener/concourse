@@ -45,7 +45,7 @@ COPY --from=go-builder /go/plugins/bin/* /usr/local/concourse/bin/
 
 
 # Add resource-types
-COPY out.d/resource-types /usr/local/concourse/resource-types
+COPY resource-types /usr/local/concourse/resource-types
 
 # Auto-wire work dir for 'worker' and 'quickstart'
 ENV CONCOURSE_WORK_DIR                /worker-state
