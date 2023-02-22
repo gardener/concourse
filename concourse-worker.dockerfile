@@ -1,5 +1,5 @@
 # Global build images
-ARG golang_concourse_builder_image
+ARG golang_concourse_builder_image=golang:alpine
 
 #
 # Build the go artefacts
