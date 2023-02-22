@@ -41,5 +41,6 @@ concourse:
     head-update: {}
     manual-release:
       traits:
+        release: ~
         version:
           preprocess: 'finalise'
