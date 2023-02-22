@@ -1,6 +1,5 @@
 concourse:
-  jobs:
-    head-update:
+  base_definition:
       traits:
         version: ~
         component_descriptor: ~
@@ -38,3 +37,9 @@ concourse:
             concourse-resource-time:
               image: 'eu.gcr.io/gardener-project/test/concourse-resource-time'
               dockerfile: concourse-resource-time.dockerfile
+  jobs:
+    head-update: {}
+    manual-release:
+      traits:
+        version:
+          preprocess: 'finalise'
