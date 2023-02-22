@@ -10,7 +10,7 @@ concourse:
           oci-builder: 'docker-buildx'
           dockerimages:
             concourse-worker:
-              image: 'eu.gcr.io/gardener-project/test/concourse-worker'
+              image: 'eu.gcr.io/gardener-project/cc/concourse-worker'
               dockerfile: concourse-worker.dockerfile
               prebuild_hook: 'prebuild-registry-resource.sh'
               build_args:
@@ -21,7 +21,7 @@ concourse:
                 guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
                 golang_concourse_builder_image: 'golang:alpine'
             concourse-web:
-              image: 'eu.gcr.io/gardener-project/test/concourse-web'
+              image: 'eu.gcr.io/gardener-project/cc/concourse-web'
               dockerfile: concourse-web.dockerfile
               platforms:
                 - linux/amd64
@@ -32,10 +32,10 @@ concourse:
                 concourse_version: '7.9.0'
                 guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
             concourse-resource-git:
-              image: 'eu.gcr.io/gardener-project/test/concourse-resource-git'
+              image: 'eu.gcr.io/gardener-project/cc/concourse-resource-git'
               dockerfile: concourse-resource-git.dockerfile
             concourse-resource-time:
-              image: 'eu.gcr.io/gardener-project/test/concourse-resource-time'
+              image: 'eu.gcr.io/gardener-project/cc/concourse-resource-time'
               dockerfile: concourse-resource-time.dockerfile
   jobs:
     head-update: {}
