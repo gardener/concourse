@@ -26,7 +26,7 @@ docker \
 
 echo "exporting image-fs"
 
-img="$(docker create --name registry-image concourse-resource-registry-image:tmp)"
+img="$(docker create --name registry-image concourse-resource-registry-image:tmp dummy)"
 echo "writing image to ${outdir}/registry-image/root.tgz"
 docker export "${img}" | gzip > "${outdir}/registry-image/root.tgz"
 
