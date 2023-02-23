@@ -10,14 +10,14 @@ RUN go get -d ./...
 RUN go build -o /assets/in ./cmd/in
 RUN go build -o /assets/out ./cmd/out
 RUN go build -o /assets/check ./cmd/check
-
-FROM alpine:edge AS resource
-RUN apk add --no-cache bash tzdata ca-certificates unzip zip gzip tar
-COPY --from=builder assets/ /opt/resource/
-RUN chmod +x /opt/resource/*
+RUN chmod +x /assets/*
 # Ensure /etc/hosts is honored
 # https://github.com/golang/go/issues/22846
 # https://github.com/gliderlabs/docker-alpine/issues/367
 RUN echo "hosts: files dns" > /etc/nsswitch.conf
+
+FROM gcr.io/distroless/static-debian11 AS resource
+COPY --from=builder assets/ /opt/resource/
+COPY --from=builder /etc/nsswitch.conf /etc/nsswitch.conf
 
 FROM resource
