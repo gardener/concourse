@@ -3,13 +3,16 @@ ARG TARGETPLATFORM
 # Global build images
 ARG golang_concourse_builder_image=golang:alpine
 
+
 #
 # Build the UI artefacts
 FROM debian:bookworm-slim AS yarn-builder
+ARG concourse_version=7.9.0
 
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
-RUN apt-get update && apt-get install -y  \
+RUN apt-get update && \
+ DEBIAN_FRONTEND=noninteractive \
+ apt-get install -y --no-install-recommends \
+  tzdata \
   git \
   curl \
   libatomic1 \
@@ -19,35 +22,11 @@ RUN apt-get update && apt-get install -y  \
   chromium \
   elm-compiler \
   nodejs \
-  npm
+  npm && \
+ npm install --global yarn && \
+ git clone --branch v${concourse_version} https://github.com/concourse/concourse /yarn/concourse
 
-#
-# NodeJS installation
-# ARG node_version=14.17.6
-# RUN if [ "${TARGETPLATFORM}" = 'linux/arm64' ]; then \
-#     export ARCH=arm64; \
-#   else \
-#     export ARCH=x64; \
-#   fi && \
-#   curl -sL https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-${ARCH}.tar.xz -o node-${node_version}-linux-${ARCH}.tar.xz && \
-#       mkdir -p /usr/local/lib/nodejs && \
-#       tar -xJf node-${node_version}-linux-${ARCH}.tar.xz -C /usr/local/lib/nodejs && \
-#       rm -Rf node-${node_version}-linux-${ARCH}.tar.xz
-# 
-# ENV PATH="/usr/local/lib/nodejs/node-v${node_version}-linux-arm64/bin:${PATH}"
-# ENV PATH="/usr/local/lib/nodejs/node-v${node_version}-linux-x64/bin:${PATH}"
-
-RUN npm install --global yarn
-
-#
-# Install elm (pre-compiled for arm64) since there is no public version available
-#ARG elm_version
-#ADD dist/elm-v${elm_version}-arm64.tar.gz /usr/local/bin
-
-#
 # Build concourse web
-ARG concourse_version
-RUN git clone --branch v${concourse_version} https://github.com/concourse/concourse /yarn/concourse
 WORKDIR /yarn/concourse
 
 # Patch the package json since we have elm pre-installed
@@ -63,7 +42,7 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version
+ARG concourse_version=7.9.0
 ARG guardian_commit_id
 ARG cni_plugins_version
 
