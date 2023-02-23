@@ -15,6 +15,13 @@ outdir="${build_dir}/resource-types"
 
 mkdir -p "${outdir}/registry-image"
 
+echo '{
+  "type": "registry-image",
+  "version": "1.7.0",
+  "privileged": false,
+  "unique_version_history": false
+}' > "${outdir}/registry-image/resource_metadata.json"
+
 echo "running docker-build"
 
 docker \
@@ -30,9 +37,3 @@ img="$(docker create --name registry-image concourse-resource-registry-image:tmp
 echo "writing image to ${outdir}/registry-image/root.tgz"
 docker export "${img}" | gzip > "${outdir}/registry-image/root.tgz"
 
-echo '{
-  "type": "registry-image",
-  "version": "1.7.0",
-  "privileged": false,
-  "unique_version_history": false,
-}' > "${outdir}/registry-image/resource_metadata.json"
