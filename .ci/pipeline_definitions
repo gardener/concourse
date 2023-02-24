@@ -20,6 +20,15 @@ concourse:
                 concourse_version: '7.9.0'
                 guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
                 golang_concourse_builder_image: 'golang:alpine'
+              resource_labels:
+                - name: 'gardener.cloud/cve-categorisation'
+                  value:
+                    network_exposure: 'public'
+                    authentication_enforced: true
+                    user_interaction: 'gardener-operator'
+                    confidentiality_requirement: 'high'
+                    integrity_requirement: 'high'
+                    availability_requirement: 'high'
             concourse-web:
               image: 'eu.gcr.io/gardener-project/cc/concourse-web'
               dockerfile: concourse-web.dockerfile
@@ -31,12 +40,39 @@ concourse:
                 concourse_docker_entrypoint_commit_id: '486894e6d6f84aad112c14094bca18bec8c48154'
                 concourse_version: '7.9.0'
                 guardian_commit_id: '51480bc73a282c02f827dde4851cc12265774272'
+              resource_labels:
+                - name: 'gardener.cloud/cve-categorisation'
+                  value:
+                    network_exposure: 'public'
+                    authentication_enforced: true
+                    user_interaction: 'gardener-operator'
+                    confidentiality_requirement: 'high'
+                    integrity_requirement: 'high'
+                    availability_requirement: 'high'
             concourse-resource-git:
               image: 'eu.gcr.io/gardener-project/cc/concourse-resource-git'
               dockerfile: concourse-resource-git.dockerfile
+              resource_labels:
+                - name: 'gardener.cloud/cve-categorisation'
+                  value:
+                    network_exposure: 'protected'
+                    authentication_enforced: false
+                    user_interaction: 'gardener-operator'
+                    confidentiality_requirement: 'low'
+                    integrity_requirement: 'high'
+                    availability_requirement: 'low'
             concourse-resource-time:
               image: 'eu.gcr.io/gardener-project/cc/concourse-resource-time'
               dockerfile: concourse-resource-time.dockerfile
+              resource_labels:
+                - name: 'gardener.cloud/cve-categorisation'
+                  value:
+                    network_exposure: 'protected'
+                    authentication_enforced: false
+                    user_interaction: 'gardener-operator'
+                    confidentiality_requirement: 'none'
+                    integrity_requirement: 'low'
+                    availability_requirement: 'none'
   jobs:
     head-update: {}
     manual-release:
