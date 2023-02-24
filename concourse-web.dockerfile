@@ -59,13 +59,6 @@ RUN git clone --branch v${concourse_version} https://github.com/concourse/concou
 WORKDIR /go/concourse
 RUN go build -v -ldflags "-extldflags '-static' -X github.com/concourse/concourse.Version=${concourse_version}" ./cmd/concourse
 
-RUN git clone --branch v${cni_plugins_version} https://github.com/containernetworking/plugins.git /go/plugins
-WORKDIR /go/plugins
-RUN apk add bash
-ENV CGO_ENABLED=0
-RUN ./build_linux.sh
-
-
 #
 # Generate the final image
 FROM debian:bookworm-slim
@@ -78,12 +71,9 @@ COPY --from=yarn-builder /yarn/concourse/web/public/ /public
 COPY --from=go-builder /go/concourse/concourse /usr/local/concourse/bin/
 COPY --from=go-builder /go/guardian/gdn /usr/local/concourse/bin/
 COPY --from=go-builder /go/guardian/cmd/init/init /usr/local/concourse/bin/
-COPY --from=go-builder /go/plugins/bin/* /usr/local/concourse/bin/
 
 
 # Auto-wire work dir for 'worker' and 'quickstart'
-# ENV CONCOURSE_WORK_DIR                /worker-state
-# ENV CONCOURSE_WORKER_WORK_DIR         /worker-state
 ENV CONCOURSE_WEB_PUBLIC_DIR          /public
 
 # Volume for non-aufs/etc. mount for baggageclaim's driver
@@ -91,14 +81,8 @@ ENV CONCOURSE_WEB_PUBLIC_DIR          /public
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    containerd \
-    iptables \
-    dumb-init \
-    iproute2 \
-    curl
-#    file \
-#    curl
-#    btrfs-progs \
+    curl \
+    dumb-init
 
 # Add fly CLI versions
 RUN mkdir -p /usr/local/concourse/fly-assets && \
