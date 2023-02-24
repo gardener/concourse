@@ -10,10 +10,7 @@ RUN go get -d ./...
 RUN go build -o /assets/in ./in
 RUN go build -o /assets/out ./out
 RUN go build -o /assets/check ./check
+RUN chmod +x /assets/*
 
-FROM alpine:edge AS resource
-RUN apk add --no-cache bash tzdata
+FROM gcr.io/distroless/static-debian11
 COPY --from=builder assets/ /opt/resource/
-RUN chmod +x /opt/resource/*
-
-FROM resource
