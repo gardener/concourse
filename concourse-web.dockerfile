@@ -5,7 +5,7 @@ ARG golang_concourse_builder_image=golang:alpine
 #
 # Build the UI artefacts
 FROM debian:bookworm-slim AS yarn-builder
-ARG concourse_version=7.9.0
+ARG concourse_version=7.9.1
 
 RUN apt-get update && \
  DEBIAN_FRONTEND=noninteractive \
@@ -34,7 +34,7 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version=7.9.0
+ARG concourse_version=7.9.1
 ARG guardian_commit_id
 ARG cni_plugins_version
 
