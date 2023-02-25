@@ -12,10 +12,8 @@ RUN apt-get update && \
  apt-get install -y --no-install-recommends \
   tzdata \
   git \
-  curl \
   libatomic1 \
   xz-utils \
-  jq \
   chromium-bsu \
   chromium \
   elm-compiler \
@@ -27,11 +25,7 @@ RUN apt-get update && \
 # Build concourse web
 WORKDIR /yarn/concourse
 
-# Patch the package json since we have elm pre-installed
-RUN cat package.json | jq 'del(.devDependencies ["elm","elm-analyse","elm-format","elm-test"])' > package.json.tmp && \
-      mv package.json.tmp package.json
-RUN yarn
-RUN yarn build
+RUN yarn && yarn build
 
 
 #
