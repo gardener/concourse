@@ -1,4 +1,5 @@
-ARG base_image=alpine:latest
+ARG base_image=alpine:3.17
+FROM eu.gcr.io/gardener-project/cc/job-image:latest as job_image
 FROM ${base_image} AS resource
 
 RUN apk --no-cache add \
@@ -187,5 +188,6 @@ RUN             rm -rf \
                     perl \
                     perl5
 
+COPY --from=job_image /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 FROM resource
