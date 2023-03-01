@@ -188,6 +188,6 @@ RUN             rm -rf \
                     perl \
                     perl5
 
-COPY --from=job_image /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=job_image /etc/ssl/certs /etc/ssl/certs
 
 FROM resource
