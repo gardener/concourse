@@ -200,9 +200,6 @@ RUN             rm -rf \
 && cp /etc/ssl/certs/ca-certificates.crt /ca-certificates-overwrite.crt \
 && cat /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt >> /ca-certificates-overwrite.crt
 
-
-#COPY root-ca.crt /ca-certificates-overwrite.crt
-
 ENV CURL_CA_BUNDLE=/ca-certificates-overwrite.crt
 
 FROM resource
