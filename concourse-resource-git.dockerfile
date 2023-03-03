@@ -195,7 +195,14 @@ RUN             rm -rf \
     /usr/local/share/ca-certificates/SAP_Global_Sub_CA_04.crt \
 && curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2005.crt -o \
     /usr/local/share/ca-certificates/SAP_Global_Sub_CA_05.crt \
+&& update-ca-certificates \
 && dos2unix /etc/ssl/certs/ca-certificates.crt \
-&& update-ca-certificates
+&& cp /etc/ssl/certs/ca-certificates.crt /ca-certificates-overwrite.crt \
+&& cat /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt >> /ca-certificates-overwrite.crt
+
+
+#COPY root-ca.crt /ca-certificates-overwrite.crt
+
+ENV CURL_CA_BUNDLE=/ca-certificates-overwrite.crt
 
 FROM resource
