@@ -186,8 +186,16 @@ RUN             rm -rf \
 WORKDIR         /usr/lib
 RUN             rm -rf \
                     perl \
-                    perl5
-
-COPY --from=job_image /etc/ssl/certs /etc/ssl/certs
+                    perl5 \
+&&  curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Root%20CA.crt -o \
+  /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt \
+&& curl http://aia.pki.co.sap.com/aia/SAPNetCA_G2.crt -o \
+    /usr/local/share/ca-certificates/SAPNetCA_G2.crt \
+&& curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2004.crt -o \
+    /usr/local/share/ca-certificates/SAP_Global_Sub_CA_04.crt \
+&& curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2005.crt -o \
+    /usr/local/share/ca-certificates/SAP_Global_Sub_CA_05.crt \
+&& dos2unix /etc/ssl/certs/ca-certificates.crt \
+&& update-ca-certificates
 
 FROM resource
