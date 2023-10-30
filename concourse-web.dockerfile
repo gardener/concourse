@@ -55,8 +55,8 @@ RUN go build -v -ldflags "-extldflags '-static' -X github.com/concourse/concours
 # Generate the final image
 FROM debian:bookworm-slim
 
-ARG concourse_version
-ARG concourse_docker_entrypoint_commit_id
+ARG concourse_version='7.9.1'
+ARG concourse_docker_entrypoint_commit_id=486894e6d6f84aad112c14094bca18bec8c48154
 
 COPY --from=yarn-builder /yarn/concourse/web/public/ /public
 
