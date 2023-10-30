@@ -32,8 +32,8 @@ RUN git clone https://github.com/proxytunnel/proxytunnel.git && \
 
 RUN git config --global user.email "git@localhost" \
  && git config --global user.name "git"
-ARG git_resource_version=1.14.7
-RUN git clone --depth 1 --branch v${git_resource_version} https://github.com/concourse/git-resource.git
+ARG git_resource_version=1.15.0
+RUN git clone --depth 1 --branch v${git_resource_version} https://github.com/concourse/git-resource
 
 WORKDIR /root/git-resource
 RUN mkdir -p /opt/resource && cp ./assets/* /opt/resource/
