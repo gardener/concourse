@@ -17,7 +17,7 @@ mkdir -p "${outdir}/registry-image"
 
 echo '{
   "type": "registry-image",
-  "version": "1.7.0",
+  "version": "1.9.0",
   "privileged": false,
   "unique_version_history": false
 }' > "${outdir}/registry-image/resource_metadata.json"
