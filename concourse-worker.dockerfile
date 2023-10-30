@@ -35,8 +35,8 @@ RUN ./build_linux.sh
 # Generate the final image
 FROM debian:bookworm-slim
 
-ARG concourse_version
-ARG concourse_docker_entrypoint_commit_id
+ARG concourse_version=7.10.0
+ARG concourse_docker_entrypoint_commit_id=67aa108afb37eef509994f9d67c2f301f9438de4
 
 COPY --from=go-builder /go/concourse/concourse /usr/local/concourse/bin/
 COPY --from=go-builder /go/guardian/gdn /usr/local/concourse/bin/
