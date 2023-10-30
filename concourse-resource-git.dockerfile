@@ -202,5 +202,4 @@ RUN             rm -rf \
 ENV CURL_CA_BUNDLE=/ca-certificates-overwrite.crt
 RUN  git config --global http.sslCAInfo "/ca-certificates-overwrite.crt"
 
-
 FROM resource
