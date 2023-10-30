@@ -7,8 +7,8 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version
-ARG guardian_commit_id
+ARG concourse_version=7.10.0
+ARG guardian_commit_id=67aa108afb37eef509994f9d67c2f301f9438de4
 ARG cni_plugins_version
 
 RUN apk add gcc git g++
