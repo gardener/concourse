@@ -1,9 +1,11 @@
-FROM golang:1.20-alpine as builder
+FROM golang:1.21-alpine as builder
 
-ARG time_resource_version=1.6.3
+ARG time_resource_version=1.7.0
 
 RUN apk add git
-RUN git clone --depth 1 --branch v${time_resource_version} https://github.com/concourse/time-resource.git /src/time-resource
+RUN git clone --depth 1 \
+  --branch v${time_resource_version} https://github.com/concourse/time-resource \
+  /src/time-resource
 WORKDIR /src/time-resource
 ENV CGO_ENABLED 0
 RUN go get -d ./...
