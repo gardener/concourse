@@ -1,6 +1,6 @@
-FROM golang:1.20-alpine as builder
+FROM golang:1.21-alpine as builder
 
-ARG registry_image_resource_version=1.7.0
+ARG registry_image_resource_version=1.9.0
 
 RUN apk add git
 RUN git clone --depth 1 --branch v${registry_image_resource_version} https://github.com/concourse/registry-image-resource.git /src/registry-image-resource
@@ -16,7 +16,7 @@ RUN chmod +x /assets/*
 # https://github.com/gliderlabs/docker-alpine/issues/367
 RUN echo "hosts: files dns" > /etc/nsswitch.conf
 
-FROM gcr.io/distroless/static-debian11 AS resource
+FROM gcr.io/distroless/static-debian12 AS resource
 COPY --from=builder assets/ /opt/resource/
 COPY --from=builder /etc/nsswitch.conf /etc/nsswitch.conf
 
