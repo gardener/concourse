@@ -1,4 +1,4 @@
-ARG base_image=alpine:3.18
+ARG base_image=alpine:3
 FROM eu.gcr.io/gardener-project/cc/job-image:latest as job_image
 FROM ${base_image} AS resource
 
