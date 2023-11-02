@@ -10,7 +10,6 @@ concourse:
           oci-builder: 'docker-buildx'
           dockerimages:
             concourse-worker:
-              image: 'eu.gcr.io/gardener-project/cc/concourse-worker'
               dockerfile: concourse-worker.dockerfile
               prebuild_hook: 'prebuild-registry-resource.sh'
               build_args:
@@ -31,7 +30,6 @@ concourse:
                     integrity_requirement: 'high'
                     availability_requirement: 'high'
             concourse-web:
-              image: 'eu.gcr.io/gardener-project/cc/concourse-web'
               dockerfile: concourse-web.dockerfile
               platforms:
                 - linux/amd64
@@ -49,7 +47,6 @@ concourse:
                     integrity_requirement: 'high'
                     availability_requirement: 'high'
             concourse-resource-git:
-              image: 'eu.gcr.io/gardener-project/cc/concourse-resource-git'
               dockerfile: concourse-resource-git.dockerfile
               resource_labels:
                 - name: 'gardener.cloud/cve-categorisation'
@@ -61,7 +58,7 @@ concourse:
                     integrity_requirement: 'high'
                     availability_requirement: 'low'
             concourse-resource-time:
-              image: 'eu.gcr.io/gardener-project/cc/concourse-resource-time'
+              image: 'europe-docker.pkg.dev/gardener-project/snapshots/cicd/concourse-resource-time'
               dockerfile: concourse-resource-time.dockerfile
               resource_labels:
                 - name: 'gardener.cloud/cve-categorisation'
@@ -73,9 +70,34 @@ concourse:
                     integrity_requirement: 'low'
                     availability_requirement: 'none'
   jobs:
-    head-update: {}
+    head-update:
+      traits:
+        component_descriptor:
+          ocm_repository: europe-docker.pkg.dev/gardener-project/snapshots
+        publish:
+          dockerimages:
+            concourse-worker:
+              image: 'europe-docker.pkg.dev/gardener-project/snapshots/cicd/concourse-worker'
+            concourse-web:
+              image: 'europe-docker.pkg.dev/gardener-project/snapshots/cicd/concourse-web'
+            concourse-resource-git:
+              image: 'europe-docker.pkg.dev/gardener-project/snapshots/cicd/concourse-resource-git'
+            concourse-resource-time:
+              image: 'europe-docker.pkg.dev/gardener-project/snapshots/cicd/concourse-resource-time'
     manual-release:
       traits:
+        component_descriptor:
+          ocm_repository: europe-docker.pkg.dev/gardener-project/releases
+        publish:
+          dockerimages:
+            concourse-worker:
+              image: 'europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-worker'
+            concourse-web:
+              image: 'europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-web'
+            concourse-resource-git:
+              image: 'europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-resource-git'
+            concourse-resource-time:
+              image: 'europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-resource-time'
         release: ~
         version:
           preprocess: 'finalise'
