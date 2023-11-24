@@ -2,7 +2,8 @@ concourse:
   base_definition:
       traits:
         version: ~
-        component_descriptor: ~
+        component_descriptor:
+          ocm_repository: europe-docker.pkg.dev/gardener-project/snapshots
         publish:
           platforms:
             - linux/arm64
