@@ -1,10 +1,11 @@
+# syntax=docker/dockerfile:1-labs
 FROM golang:1.21-alpine as builder
 
-ARG time_resource_version=1.7.0
+ARG time_resource_version=v1.7.0
 
-RUN apk add git
-RUN git clone --depth 1 \
-  --branch v${time_resource_version} https://github.com/concourse/time-resource \
+RUN mkdir /src
+ADD --keep-git-dir=false \
+  https://github.com/concourse/time-resource.git#${time_resource_version} \
   /src/time-resource
 WORKDIR /src/time-resource
 ENV CGO_ENABLED 0
