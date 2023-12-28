@@ -22,7 +22,10 @@ RUN gcc -static -o init init.c ignore_sigchild.c
 
 RUN git clone --branch v${concourse_version} https://github.com/concourse/concourse /go/concourse
 WORKDIR /go/concourse
-RUN go build -v -ldflags "-extldflags '-static' -X github.com/concourse/concourse.Version=${concourse_version}" ./cmd/concourse
+# CGO_FLAGS: https://github.com/mattn/go-sqlite3/issues/1164#issuecomment-1635253695
+RUN CGO_CFLAGS="-D_LARGEFILE64_SOURCE" \
+    go build -v -ldflags "-extldflags '-static'\
+    -X github.com/concourse/concourse.Version=${concourse_version}" ./cmd/concourse
 
 RUN git clone --branch v${cni_plugins_version} https://github.com/containernetworking/plugins.git /go/plugins
 WORKDIR /go/plugins
