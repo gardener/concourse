@@ -15,5 +15,5 @@ RUN go build -o /assets/out ./out
 RUN go build -o /assets/check ./check
 RUN chmod +x /assets/*
 
-FROM gcr.io/distroless/static-debian11
+FROM gcr.io/distroless/static-debian12
 COPY --from=builder assets/ /opt/resource/
