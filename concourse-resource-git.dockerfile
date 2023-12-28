@@ -14,8 +14,7 @@ RUN apk --no-cache add \
   openssl-dev \
   make \
   g++ \
-  openssh \
-  perl \
+  openssh-client \
   tar \
   libstdc++ \
   coreutils
