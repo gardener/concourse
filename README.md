@@ -1,5 +1,6 @@
 Concourse-CI Images build
 =========================
+[![REUSE status](https://api.reuse.software/badge/github.com/gardener/concourse)](https://api.reuse.software/info/github.com/gardener/concourse)
 
 This repository was inspired by https://github.com/robinhuiser/concourse-arm64.
 
