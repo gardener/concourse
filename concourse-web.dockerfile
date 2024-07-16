@@ -19,7 +19,11 @@ RUN apt-get update && \
   nodejs \
   npm && \
  npm install --global yarn && \
- git clone --branch v${concourse_version} https://github.com/concourse/concourse /yarn/concourse
+ git clone --branch v${concourse_version} https://github.com/concourse/concourse /yarn/concourse \
+&& GIT_DIR=/yarn/concourse/.git \
+  git fetch origin c6ae4b6d858ebd0bc74f0ce94231f491d5ccdb18 \
+&& GIT_DIR=/yarn/concourse/.git/ GIT_WORK_TREE=/yarn/concourse \
+  git checkout c6ae4b6d858ebd0bc74f0ce94231f491d5ccdb18
 
 # Build concourse web
 WORKDIR /yarn/concourse
