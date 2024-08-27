@@ -1,5 +1,4 @@
-ARG base_image=alpine:3
-FROM ${base_image} AS resource
+FROM alpine:3 AS resource
 
 RUN apk --no-cache add \
   bash \
