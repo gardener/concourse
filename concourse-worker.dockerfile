@@ -77,7 +77,11 @@ RUN apt-get update && apt-get install -y \
 && curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2005.crt -o \
     /usr/local/share/ca-certificates/SAP_Global_Sub_CA_05.crt \
 && dos2unix /etc/ssl/certs/ca-certificates.crt \
-&& update-ca-certificates
+&& update-ca-certificates \
+&& apt-get remove -y \
+    curl \
+    dos2unix \
+&& apt clean
 
 
 STOPSIGNAL SIGUSR2
