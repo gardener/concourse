@@ -9,7 +9,7 @@ ENV GO111MODULE=on
 
 ARG concourse_version=7.11.2
 ARG guardian_commit_id=01b74f60037d631fea4bd85ff54ebace511f1a30
-ARG cni_plugins_version
+ARG cni_plugins_version=0.8.7
 
 RUN apk add gcc git g++
 
