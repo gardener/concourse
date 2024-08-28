@@ -1,5 +1,4 @@
-# syntax=docker/dockerfile:1-labs
-FROM golang:1.21-alpine as builder
+FROM golang:alpine AS builder
 
 ARG time_resource_version=v1.7.0
 
@@ -8,7 +7,7 @@ ADD --keep-git-dir=false \
   https://github.com/concourse/time-resource.git#${time_resource_version} \
   /src/time-resource
 WORKDIR /src/time-resource
-ENV CGO_ENABLED 0
+ENV CGO_ENABLED=0
 RUN go get -d ./...
 RUN go build -o /assets/in ./in
 RUN go build -o /assets/out ./out
