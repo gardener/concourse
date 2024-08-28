@@ -184,6 +184,7 @@ RUN apk --no-cache add \
 && cat /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt >> /ca-certificates-overwrite.crt \
 && git config --global http.sslCAInfo "/ca-certificates-overwrite.crt" \
 && apk del --no-cache \
+  dos2unix \
   openssl-dev \
   make \
   g++
