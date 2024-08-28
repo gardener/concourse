@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine as builder
+FROM golang:alpine AS builder
 
 ARG registry_image_resource_version=1.9.0
 
