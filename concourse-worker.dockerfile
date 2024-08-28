@@ -81,6 +81,7 @@ RUN apt-get update && apt-get install -y \
 && apt-get remove -y \
     curl \
     dos2unix \
+&& apt autoremove -y \
 && apt clean
 
 
