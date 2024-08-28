@@ -101,7 +101,11 @@ RUN apt-get update && apt-get install -y \
   curl \
     -sL https://github.com/concourse/concourse/releases/download/v${concourse_version}/fly-${concourse_version}-windows-amd64.zip \
    -o /usr/local/concourse/fly-assets/fly-windows-amd64.zip \
-&& apt-get remove -y curl
+&& apt-get remove -y \
+  curl \
+  dos2unix \
+&& apt autoremove -y \
+&& apt clean
 
 
 STOPSIGNAL SIGUSR2
