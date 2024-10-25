@@ -4,6 +4,12 @@ concourse:
         version: ~
         component_descriptor:
           ocm_repository: europe-docker.pkg.dev/gardener-project/snapshots
+          component_labels:
+          - name: 'cloud.gardener.cnudie/responsibles'
+            value:
+            - type: 'githubTeam'
+              teamname: 'gardener/ci-maintainers'
+              github_hostname: 'github.com'
         publish:
           platforms:
             - linux/arm64
