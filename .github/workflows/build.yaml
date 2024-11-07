@@ -120,9 +120,9 @@ jobs:
                   network_exposure: protected
                   authentication_enforced: false
                   user_interaction: gardener-operator
-                  confidentiality_requirement: low
+                  confidentiality_requirement: none
                   integrity_requirement: high
-                  availability_requirement: low
+                  availability_requirement: none
     outputs:
       strategy: ${{ toJSON(strategy) }}
 
@@ -133,7 +133,7 @@ jobs:
         run: |
           ./prebuild-registry-resource.sh
       - name: Build OCI Image
-        uses: gardener/cc-utils/.github/actions/ocm-oci-build@gha-matrix-workaround
+        uses: gardener/cc-utils/.github/actions/ocm-oci-build@master
         with:
           name: ${{ matrix.image.name }}
           repository: ${{ needs.params.outputs.oci_repository}}/${{ matrix.image.name }}
@@ -230,10 +230,8 @@ jobs:
           echo "Component-Descriptor ready to be uploaded:"
           cat component-descriptor.yaml
       - name: authenticate
-        if: ${{ inputs.release }}
         uses: gardener/cc-utils/.github/actions/gar-auth@master
       - name: upload OCM Component-Descriptor
-        if: ${{ inputs.release }}
         run: |
           echo "uploading component-descriptor"
           gardener-ocm \
