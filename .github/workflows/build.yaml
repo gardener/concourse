@@ -1,0 +1,279 @@
+name: Build
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      release:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  params:
+    runs-on: ubuntu-latest
+    outputs:
+      ocm_repository: ${{ steps.params.outputs.ocm_repository }}
+      oci_repository: ${{ steps.params.outputs.oci_repository }}
+      oci_platforms: ${{ steps.params.outputs.oci_platforms }}
+    steps:
+      - name: params
+        id: params
+        run: |
+          if ${{ inputs.release || false }}; then
+            ocm_repo='europe-docker.pkg.dev/gardener-project/releases'
+            oci_repo='europe-docker.pkg.dev/gardener-project/releases/cicd'
+          else
+            ocm_repo='europe-docker.pkg.dev/gardener-project/snapshots'
+            oci_repo='europe-docker.pkg.dev/gardener-project/snapshots/cicd'
+          fi
+          oci_platforms='linux/arm64,linux/amd64'
+
+          echo "ocm_repository=${ocm_repo}" >> ${GITHUB_OUTPUT}
+          echo "oci_repository=${oci_repo}" >> ${GITHUB_OUTPUT}
+          echo "oci_platforms=${oci_platforms}" >> ${GITHUB_OUTPUT}
+
+  version: # TODO: this (mostly) copy-pasted from cc-utils; factor-out into re-usable workflow
+    runs-on: ubuntu-latest
+    outputs:
+      effective_version: ${{ steps.version.outputs.effective_version }}
+      next_version: ${{ steps.version.outputs.next_version }}
+      repo_version: ${{ steps.version.outputs.repo_version }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: calculate-effective-version
+      id: version
+      run: |
+        src_version="$(cat VERSION | grep -v -e'^#')"
+        commit=${{ github.sha }}
+        echo "commit-digest: ${commit}"
+        major="$(echo ${src_version} | cut -d. -f1)"
+        minor="$(echo ${src_version} | cut -d. -f2)"
+        patch="$(echo ${src_version} | cut -d. -f3 | cut -d- -f1)"
+
+        if ${{ inputs.release || false }}; then
+          effective_version=${major}.${minor}.${patch}
+          # hardcode to bumping "minor" for now
+          next_minor=$(( $minor + 1 ))
+          next_version="${major}.${next_minor}.${patch}-dev"
+          echo "next_version=${next_version}" >> "${GITHUB_OUTPUT}"
+          echo "next_version=${next_version}"
+        else
+          effective_version=${major}.${minor}.${patch}-${commit}
+        fi
+        echo "effective-version: ${effective_version}"
+        echo "effective_version=${effective_version}" >> "${GITHUB_OUTPUT}"
+        echo "repo_version=${src_version}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    needs:
+      - params
+      - version
+    strategy:
+      matrix:
+        image:
+          - name: concourse-worker
+            dockerfile: concourse-worker.dockerfile
+            oci_platforms: ${{ needs.params.outputs.oci_platforms }}
+            # todo: handle build-args
+            labels: |
+              - name: gardener.cloud/cve-categorisation
+                value:
+                  network_exposure: public
+                  authentication_enforced: true
+                  user_interaction: gardener-operator
+                  confidentiality_requirement: high
+                  integrity_requirement: high
+                  availability_requirement: high
+          - name: concourse-web
+            dockerfile: concourse-web.dockerfile
+            oci_platforms: linux/amd64
+            labels: |
+              - name: gardener.cloud/cve-categorisation
+                value:
+                  network_exposure: public
+                  authentication_enforced: true
+                  user_interaction: gardener-operator
+                  confidentiality_requirement: high
+                  integrity_requirement: high
+                  availability_requirement: high
+          - name: concourse-resource-git
+            dockerfile: concourse-resource-git.dockerfile
+            oci_platforms: ${{ needs.params.outputs.oci_platforms }}
+            labels: |
+              - name: gardener.cloud/cve-categorisation
+                value:
+                  network_exposure: protected
+                  authentication_enforced: false
+                  user_interaction: gardener-operator
+                  confidentiality_requirement: low
+                  integrity_requirement: high
+                  availability_requirement: low
+          - name: concourse-resource-time
+            dockerfile: concourse-resource-time.dockerfile
+            oci_platforms: ${{ needs.params.outputs.oci_platforms }}
+            labels: |
+              - name: gardener.cloud/cve-categorisation
+                value:
+                  network_exposure: protected
+                  authentication_enforced: false
+                  user_interaction: gardener-operator
+                  confidentiality_requirement: low
+                  integrity_requirement: high
+                  availability_requirement: low
+    outputs:
+      strategy: ${{ toJSON(strategy) }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: prebuild-hook
+        if: ${{ matrix.image.name == 'concourse-worker' }}
+        run: |
+          ./prebuild-registry-resource.sh
+      - name: Build OCI Image
+        uses: gardener/cc-utils/.github/actions/ocm-oci-build@gha-matrix-workaround
+        with:
+          name: ${{ matrix.image.name }}
+          repository: ${{ needs.params.outputs.oci_repository}}/${{ matrix.image.name }}
+          version: ${{ needs.version.outputs.effective_version }}
+          ocm_labels: ${{ matrix.image.labels }}
+          oci_platforms: ${{ matrix.image.oci_platforms }}
+          context: .
+          dockerfile: ${{ matrix.image.dockerfile }}
+
+  component_descriptor:
+    runs-on: ubuntu-latest
+    container:
+      image: python:alpine
+    permissions:
+      contents: write
+      id-token: write
+    needs:
+      - params
+      - version
+      - build
+    steps:
+      - name: install gardener-ocm
+        run: |
+          pip install \
+            gardener-oci \
+            gardener-ocm \
+      - name: merge ocm-resource-fragments
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: ocm-oci-resources
+          # only merge ocm-fragments emitted from ocm-oci-build-action
+          pattern: ocm-oci-build*
+          separate-directories: true
+          delete-merged: true
+      - name: download-ocm-oci-resources
+        uses: actions/download-artifact@v4
+        with:
+          name: ocm-oci-resources
+          path: ocm-oci-resources.d
+
+      - name: generate OCM Component-Descriptor
+        run: |
+          env | sort
+          version=${{ needs.version.outputs.effective_version }}
+          ocm_repo=${{ needs.params.outputs.ocm_repository }}
+
+          echo "base component-descriptor"
+          gardener-ocm \
+            create \
+            --name github.com/${{ github.repository }} \
+            --version  ${version} \
+            --ocm-repo ${ocm_repo} \
+            --provider sap-se \
+            --label '{
+              "name": "cloud.gardener.cnudie/responsibles",
+              "value":  [
+                {
+                  "type": "githubTeam",
+                  "teamname": "gardener/ci-maintainers",
+                  "github_hostname": "github.com"
+                }
+              ]
+            }' \
+            > component-descriptor.yaml
+            cat component-descriptor.yaml
+
+            echo "adding main-source"
+            echo "\
+            name: main-source
+            version: ${version}
+            type: git
+            labels:
+              - name: cloud.gardener/cicd/source
+                value:
+                  repository-classification: main
+            access:
+              type: github
+              repoUrl: github.com/${{ github.repository }}
+              version: ${version}
+              commit: ${{ github.sha }}
+              ref: ${{ github.ref }}
+            " \
+            | gardener-ocm \
+              append source \
+              --file component-descriptor.yaml
+
+            for rf in $(find ocm-oci-resources.d -type f -name ocm-resources.yaml); do
+              echo "adding ocm-resources from ${rf}"
+              cat ${rf} | gardener-ocm \
+                append resource \
+                --file component-descriptor.yaml
+            done
+
+          echo "Component-Descriptor ready to be uploaded:"
+          cat component-descriptor.yaml
+      - name: authenticate
+        if: ${{ inputs.release }}
+        uses: gardener/cc-utils/.github/actions/gar-auth@master
+      - name: upload OCM Component-Descriptor
+        if: ${{ inputs.release }}
+        run: |
+          echo "uploading component-descriptor"
+          gardener-ocm \
+            upload \
+            --file component-descriptor.yaml
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:3
+    if: ${{ inputs.release }}
+    needs:
+      - version
+      - component_descriptor
+    permissions:
+      contents: write
+    steps:
+      - name: Install Prerequisites
+        run: |
+          apk add --no-cache \
+            bash
+            git
+          git config --global --add safe.directory /__w/${{ github.repository }}
+      - uses: actions/checkout@v4
+      - name: Create Release and Bump-Commits
+        run: |
+          git config user.name 'Gardener-CICD Bot'
+          git config user.email gardener.ci.user@gmai.com
+          git clean -fdx
+          release_version=${{ needs.version.outputs.effective_version }}
+          echo -n "${release_version}" > VERSION
+          git add VERSION
+          git commit -m "Release ${release_version}"
+          tgt_ref="refs/tags/${release_version}"
+          git push origin "@:${tgt_ref}"
+          echo "pushed release-commit to ${tgt_ref}"
+          git reset --hard @~
+          git pull --rebase
+          next_version=${{ needs.version.next_version }}
+          echo "next version: ${next_version}"
+          echo -n ${next_version} > VERSION
+          git add VERSION
+          git commit -m "Prepare next Dev-Cycle"
+          git push origin
