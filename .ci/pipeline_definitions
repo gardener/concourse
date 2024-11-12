@@ -19,12 +19,6 @@ concourse:
             concourse-worker:
               dockerfile: concourse-worker.dockerfile
               prebuild_hook: 'prebuild-registry-resource.sh'
-              build_args:
-                # see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
-                cni_plugins_version: '0.8.7'
-                # https://github.com/concourse/concourse-docker
-                concourse_docker_entrypoint_commit_id: '67aa108afb37eef509994f9d67c2f301f9438de4'
-                golang_concourse_builder_image: 'golang:alpine'
               resource_labels:
                 - name: 'gardener.cloud/cve-categorisation'
                   value:
@@ -38,9 +32,6 @@ concourse:
               dockerfile: concourse-web.dockerfile
               platforms:
                 - linux/amd64
-              build_args:
-                # see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
-                concourse_docker_entrypoint_commit_id: '67aa108afb37eef509994f9d67c2f301f9438de4'
               resource_labels:
                 - name: 'gardener.cloud/cve-categorisation'
                   value:

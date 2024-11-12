@@ -61,6 +61,7 @@ RUN CGO_CFLAGS="-D_LARGEFILE64_SOURCE" \
 FROM debian:bookworm-slim
 
 ARG concourse_version=7.11.2
+# see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
 ARG concourse_docker_entrypoint_commit_id=ced6f3117d93121323098d094cf7ccc1776df521
 
 COPY --from=yarn-builder /yarn/concourse/web/public/ /public

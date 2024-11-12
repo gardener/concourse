@@ -39,6 +39,7 @@ RUN ./build_linux.sh
 FROM debian:bookworm-slim
 
 ARG concourse_version=7.11.2
+# https://github.com/concourse/concourse-docker
 ARG concourse_docker_entrypoint_commit_id=ced6f3117d93121323098d094cf7ccc1776df521
 
 COPY --from=go-builder /go/concourse/concourse /usr/local/concourse/bin/
