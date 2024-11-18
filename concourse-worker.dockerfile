@@ -7,9 +7,9 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version=7.11.2
-ARG guardian_commit_id=01b74f60037d631fea4bd85ff54ebace511f1a30
-ARG cni_plugins_version=1.5.1
+ARG concourse_version=7.12.0
+ARG guardian_commit_id=c4541e8d2645c2cd2b592a1ff053bc2e24902435
+ARG cni_plugins_version=1.6.0
 
 RUN apk add gcc git g++
 
@@ -38,7 +38,6 @@ RUN ./build_linux.sh
 # Generate the final image
 FROM debian:bookworm-slim
 
-ARG concourse_version=7.11.2
 # https://github.com/concourse/concourse-docker
 ARG concourse_docker_entrypoint_commit_id=ced6f3117d93121323098d094cf7ccc1776df521
 
