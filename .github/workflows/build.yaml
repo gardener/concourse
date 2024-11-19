@@ -157,6 +157,10 @@ jobs:
     steps:
       - name: install gardener-ocm
         run: |
+          # todo: either rm dependency towards bash from gar-auth, or have the action handle
+          #       bash-installation itself
+          apk add --no-cache \
+            bash
           pip install \
             gardener-oci \
             gardener-ocm \
