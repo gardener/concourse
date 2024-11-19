@@ -51,9 +51,9 @@ COPY --from=go-builder /go/plugins/bin/* /usr/local/concourse/bin/
 COPY resource-types /usr/local/concourse/resource-types
 
 # Auto-wire work dir for 'worker' and 'quickstart'
-ENV CONCOURSE_WORK_DIR                /worker-state
-ENV CONCOURSE_WORKER_WORK_DIR         /worker-state
-ENV CONCOURSE_WEB_PUBLIC_DIR          /public
+ENV CONCOURSE_WORK_DIR=/worker-state
+ENV CONCOURSE_WORKER_WORK_DIR=/worker-state
+ENV CONCOURSE_WEB_PUBLIC_DIR=/public
 
 # Volume for non-aufs/etc. mount for baggageclaim's driver
 VOLUME /worker-state

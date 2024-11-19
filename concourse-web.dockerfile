@@ -72,7 +72,7 @@ COPY --from=go-builder /go/guardian/cmd/init/init /usr/local/concourse/bin/
 
 
 # Auto-wire work dir for 'worker' and 'quickstart'
-ENV CONCOURSE_WEB_PUBLIC_DIR          /public
+ENV CONCOURSE_WEB_PUBLIC_DIR=/public
 
 # Volume for non-aufs/etc. mount for baggageclaim's driver
 # VOLUME /worker-state
