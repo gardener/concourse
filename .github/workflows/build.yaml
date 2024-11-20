@@ -257,10 +257,10 @@ jobs:
           apk add --no-cache \
             bash \
             git
-          git config --global --add safe.directory /__w/${{ github.repository }}
       - uses: actions/checkout@v4
       - name: Create Release and Bump-Commits
         run: |
+          git config --global --add safe.directory /__w/${{ github.repository }}
           git config user.name 'Gardener-CICD Bot'
           git config user.email gardener.ci.user@gmai.com
           git clean -fdx
