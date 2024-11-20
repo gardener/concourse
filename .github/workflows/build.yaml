@@ -255,7 +255,7 @@ jobs:
       - name: Install Prerequisites
         run: |
           apk add --no-cache \
-            bash
+            bash \
             git
           git config --global --add safe.directory /__w/${{ github.repository }}
       - uses: actions/checkout@v4
