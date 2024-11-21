@@ -273,7 +273,7 @@ jobs:
           echo "pushed release-commit to ${tgt_ref}"
           git reset --hard @~
           git pull --rebase
-          next_version=${{ needs.version.next_version }}
+          next_version=${{ needs.version.outputs.next_version }}
           echo "next version: ${next_version}"
           echo -n ${next_version} > VERSION
           git add VERSION
