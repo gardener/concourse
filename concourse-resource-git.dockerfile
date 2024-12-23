@@ -5,6 +5,7 @@ WORKDIR /root
 
 RUN apk --no-cache add \
   bash \
+  ca-certificates \
   curl \
   git \
   git-crypt \
