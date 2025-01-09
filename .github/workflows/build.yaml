@@ -155,15 +155,8 @@ jobs:
       - version
       - build
     steps:
-      - name: install gardener-ocm
-        run: |
-          # todo: either rm dependency towards bash from gar-auth, or have the action handle
-          #       bash-installation itself
-          apk add --no-cache \
-            bash
-          pip install \
-            gardener-oci \
-            gardener-ocm \
+      - name: install gardener-gha-libs
+        uses: gardener/cc-utils/.github/actions/install-gardener-gha-libs@master
       - name: merge ocm-resource-fragments
         uses: actions/upload-artifact/merge@v4
         with:
