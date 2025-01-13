@@ -194,6 +194,13 @@ jobs:
                 }
               ]
             }' \
+            --label '{
+              "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+              "value": {
+                "policy": "skip",
+                "comment": "the repository does not contain source code, but only the build-description of concourse-ci",
+              }
+            }' \
             > component-descriptor.yaml
             cat component-descriptor.yaml
 
