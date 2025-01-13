@@ -173,8 +173,6 @@ jobs:
       contents: write
       id-token: write
     needs:
-      - params
-      - version
       - build
       - base-component-descriptor
     steps:
@@ -197,20 +195,18 @@ jobs:
       - name: generate OCM Component-Descriptor
         run: |
           env | sort
-          version=${{ needs.version.outputs.effective_version }}
-          ocm_repo=${{ needs.params.outputs.ocm_repository }}
 
           echo "base component-descriptor"
           echo "${{ needs.base-component-descriptor.outputs.component-desriptor }}" \
            > component-descriptor.yaml
           cat component-descriptor.yaml
 
-            for rf in $(find ocm-oci-resources.d -type f -name ocm-resources.yaml); do
-              echo "adding ocm-resources from ${rf}"
-              cat ${rf} | gardener-ocm \
-                append resource \
-                --file component-descriptor.yaml
-            done
+          for rf in $(find ocm-oci-resources.d -type f -name ocm-resources.yaml); do
+            echo "adding ocm-resources from ${rf}"
+            cat ${rf} | gardener-ocm \
+              append resource \
+              --file component-descriptor.yaml
+          done
 
           echo "Component-Descriptor ready to be uploaded:"
           cat component-descriptor.yaml
