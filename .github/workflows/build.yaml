@@ -143,6 +143,28 @@ jobs:
           context: .
           dockerfile: ${{ matrix.image.dockerfile }}
 
+  base-component-descriptor:
+    needs:
+      - version
+      - params
+    uses: gardener/cc-utils/.github/workflows/base-component-descriptor.yaml@master
+    with:
+      version: ${{ needs.version.outputs.effective_version }}
+      ocm-repo: ${{ needs.params.outputs.ocm_repository }}
+      commit-digest: ${{ needs.version.outputs.release-commit-digest }}
+      labels: |
+        - name: cloud.gardener.cnudie/responsibles
+          value:
+            - type: githubTeam
+              teamname: gardener/ci-maintainers
+              github_hostname: github.com
+        - name: cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1
+          value:
+            policy: skip
+            comment: |
+              the repository does not contain source code, but only the
+              build-description of concourse-ci
+
   component_descriptor:
     runs-on: ubuntu-latest
     container:
@@ -154,6 +176,7 @@ jobs:
       - params
       - version
       - build
+      - base-component-descriptor
     steps:
       - name: install gardener-gha-libs
         uses: gardener/cc-utils/.github/actions/install-gardener-gha-libs@master
@@ -178,51 +201,9 @@ jobs:
           ocm_repo=${{ needs.params.outputs.ocm_repository }}
 
           echo "base component-descriptor"
-          gardener-ocm \
-            create \
-            --name github.com/${{ github.repository }} \
-            --version  ${version} \
-            --ocm-repo ${ocm_repo} \
-            --provider sap-se \
-            --label '{
-              "name": "cloud.gardener.cnudie/responsibles",
-              "value":  [
-                {
-                  "type": "githubTeam",
-                  "teamname": "gardener/ci-maintainers",
-                  "github_hostname": "github.com"
-                }
-              ]
-            }' \
-            --label '{
-              "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
-              "value": {
-                "policy": "skip",
-                "comment": "the repository does not contain source code, but only the build-description of concourse-ci",
-              }
-            }' \
-            > component-descriptor.yaml
-            cat component-descriptor.yaml
-
-            echo "adding main-source"
-            echo "\
-            name: main-source
-            version: ${version}
-            type: git
-            labels:
-              - name: cloud.gardener/cicd/source
-                value:
-                  repository-classification: main
-            access:
-              type: github
-              repoUrl: github.com/${{ github.repository }}
-              version: ${version}
-              commit: ${{ github.sha }}
-              ref: ${{ github.ref }}
-            " \
-            | gardener-ocm \
-              append source \
-              --file component-descriptor.yaml
+          echo "${{ needs.base-component-descriptor.outputs.component-desriptor }}" \
+           > component-descriptor.yaml
+          cat component-descriptor.yaml
 
             for rf in $(find ocm-oci-resources.d -type f -name ocm-resources.yaml); do
               echo "adding ocm-resources from ${rf}"
