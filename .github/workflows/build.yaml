@@ -197,7 +197,7 @@ jobs:
           env | sort
 
           echo "base component-descriptor"
-          echo "${{ needs.base-component-descriptor.outputs.component-desriptor }}" \
+          echo "${{ needs.base-component-descriptor.outputs.component-descriptor }}" \
            > component-descriptor.yaml
           cat component-descriptor.yaml
 
