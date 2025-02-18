@@ -10,6 +10,8 @@ on:
         type: string
         required: false
         default: commit-digest-as-prerelease
+      version-commit-message:
+        type: string
     outputs:
       version-commit-objects:
         value: ${{ jobs.version.outputs.commit-objects }}
@@ -48,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      commit-message: ${{ inputs.version-commit-message }}
       commit-objects: ${{ steps.version.outputs.commit-objects }}
       commit-digest: ${{ steps.version.outputs.commit-digest }}
     steps:
