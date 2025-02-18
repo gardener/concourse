@@ -139,7 +139,7 @@ jobs:
         with:
           name: ${{ matrix.image.name }}
           repository: ${{ needs.params.outputs.oci_repository}}/${{ matrix.image.name }}
-          version: ${{ needs.version.outputs.effective_version }}
+          version: ${{ needs.version.outputs.version }}
           ocm_labels: ${{ matrix.image.labels }}
           oci_platforms: ${{ matrix.image.oci_platforms }}
           context: .
