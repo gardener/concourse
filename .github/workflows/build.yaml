@@ -53,7 +53,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: version
       id: version
-      uses: gardener/cc-utils/.github/actions/version
+      uses: gardener/cc-utils/.github/actions/version@master
       with:
         version-operation: ${{ inputs.version-operation }}
 
