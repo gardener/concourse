@@ -211,7 +211,7 @@ jobs:
           echo "Component-Descriptor ready to be uploaded:"
           cat component-descriptor.yaml
       - name: authenticate
-        uses: gardener/cc-utils/.github/actions/gar-auth@master
+        uses: gardener/cc-utils/.github/actions/oci-auth@master
       - name: upload OCM Component-Descriptor
         run: |
           echo "uploading component-descriptor"
