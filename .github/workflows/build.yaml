@@ -8,6 +8,7 @@ on:
         default: false
       version-operation:
         type: string
+        required: false
         default: commit-digest-as-prerelease
     outputs:
       version-commit-objects:
