@@ -133,7 +133,7 @@ jobs:
         run: |
           ./prebuild-registry-resource.sh
       - name: Authenticate against OCI-Registry
-        uses: gardener/cc-utils/.github/actions/oci-auth
+        uses: gardener/cc-utils/.github/actions/oci-auth@master
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
           oci-image-reference: ${{ needs.params.outputs.oci_repository }}
