@@ -1,0 +1,11 @@
+name: CI (non-release)
+on:
+  push:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+    with:
+      release: false
+      version-operation: commit-digest-as-prerelease
+      version-commit-message: "build ${version}"

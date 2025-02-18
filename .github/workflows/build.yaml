@@ -1,12 +1,23 @@
 name: Build
 on:
-  push:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       release:
         required: false
         type: boolean
         default: false
+      version-operation:
+        type: string
+        default: commit-digest-as-prerelease
+    outputs:
+      version-commit-objects:
+        value: ${{ jobs.version.outputs.commit-objects }}
+      version-commit-digest:
+        value: ${{ jobs.version.outputs.commit-digest }}
+      effective-version:
+        value: ${{ jobs.version.outputs.version }}
+      component-descriptor:
+        value: ${{ jobs.component_descriptor.outputs.component-descriptor }}
 
 jobs:
   params:
@@ -32,37 +43,19 @@ jobs:
           echo "oci_repository=${oci_repo}" >> ${GITHUB_OUTPUT}
           echo "oci_platforms=${oci_platforms}" >> ${GITHUB_OUTPUT}
 
-  version: # TODO: this (mostly) copy-pasted from cc-utils; factor-out into re-usable workflow
+  version:
     runs-on: ubuntu-latest
     outputs:
-      effective_version: ${{ steps.version.outputs.effective_version }}
-      next_version: ${{ steps.version.outputs.next_version }}
-      repo_version: ${{ steps.version.outputs.repo_version }}
+      version: ${{ steps.version.outputs.version }}
+      commit-objects: ${{ steps.version.outputs.commit-objects }}
+      commit-digest: ${{ steps.version.outputs.commit-digest }}
     steps:
     - uses: actions/checkout@v4
-    - name: calculate-effective-version
+    - name: version
       id: version
-      run: |
-        src_version="$(cat VERSION | grep -v -e'^#')"
-        commit=${{ github.sha }}
-        echo "commit-digest: ${commit}"
-        major="$(echo ${src_version} | cut -d. -f1)"
-        minor="$(echo ${src_version} | cut -d. -f2)"
-        patch="$(echo ${src_version} | cut -d. -f3 | cut -d- -f1)"
-
-        if ${{ inputs.release || false }}; then
-          effective_version=${major}.${minor}.${patch}
-          # hardcode to bumping "minor" for now
-          next_minor=$(( $minor + 1 ))
-          next_version="${major}.${next_minor}.${patch}-dev"
-          echo "next_version=${next_version}" >> "${GITHUB_OUTPUT}"
-          echo "next_version=${next_version}"
-        else
-          effective_version=${major}.${minor}.${patch}-${commit}
-        fi
-        echo "effective-version: ${effective_version}"
-        echo "effective_version=${effective_version}" >> "${GITHUB_OUTPUT}"
-        echo "repo_version=${src_version}" >> "${GITHUB_OUTPUT}"
+      uses: gardener/cc-utils/.github/actions/version
+      with:
+        version-operation: ${{ inputs.version-operation }}
 
   build:
     runs-on: ubuntu-latest
@@ -154,9 +147,9 @@ jobs:
       - params
     uses: gardener/cc-utils/.github/workflows/base-component-descriptor.yaml@master
     with:
-      version: ${{ needs.version.outputs.effective_version }}
+      version: ${{ needs.version.outputs.version }}
       ocm-repo: ${{ needs.params.outputs.ocm_repository }}
-      commit-digest: ${{ needs.version.outputs.release-commit-digest }}
+      commit-digest: ${{ needs.version.outputs.commit-digest }}
       labels: |
         - name: cloud.gardener.cnudie/responsibles
           value:
@@ -172,6 +165,8 @@ jobs:
 
   component_descriptor:
     runs-on: ubuntu-latest
+    outputs:
+      component-descriptor: ${{ steps.gen.outputs.component-descriptor }}
     container:
       image: python:alpine
     permissions:
@@ -198,6 +193,7 @@ jobs:
           path: ocm-oci-resources.d
 
       - name: generate OCM Component-Descriptor
+        id: gen
         run: |
           env | sort
 
@@ -214,7 +210,12 @@ jobs:
           done
 
           echo "Component-Descriptor ready to be uploaded:"
+
           cat component-descriptor.yaml
+          echo 'component-descriptor<<EOF' >> ${GITHUB_OUTPUT}
+          cat component-descriptor.yaml
+          echo EOF >> ${GITHUB_OUTPUT}
+
       - name: authenticate
         uses: gardener/cc-utils/.github/actions/oci-auth@master
       - name: upload OCM Component-Descriptor
@@ -223,41 +224,3 @@ jobs:
           gardener-ocm \
             upload \
             --file component-descriptor.yaml
-  release:
-    runs-on: ubuntu-latest
-    container:
-      image: alpine:3
-    if: ${{ inputs.release }}
-    needs:
-      - version
-      - component_descriptor
-    permissions:
-      contents: write
-    steps:
-      - name: Install Prerequisites
-        run: |
-          apk add --no-cache \
-            bash \
-            git
-      - uses: actions/checkout@v4
-      - name: Create Release and Bump-Commits
-        run: |
-          git config --global --add safe.directory $PWD
-          git config user.name 'Gardener-CICD Bot'
-          git config user.email gardener.ci.user@gmai.com
-          git clean -fdx
-          release_version=${{ needs.version.outputs.effective_version }}
-          echo -n "${release_version}" > VERSION
-          git add VERSION
-          git commit -m "Release ${release_version}"
-          tgt_ref="refs/tags/${release_version}"
-          git push origin "@:${tgt_ref}"
-          echo "pushed release-commit to ${tgt_ref}"
-          git reset --hard @~
-          git pull --rebase
-          next_version=${{ needs.version.outputs.next_version }}
-          echo "next version: ${next_version}"
-          echo -n ${next_version} > VERSION
-          git add VERSION
-          git commit -m "Prepare next Dev-Cycle"
-          git push origin
