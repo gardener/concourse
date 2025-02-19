@@ -7,7 +7,7 @@ jobs:
     uses: ./.github/workflows/build.yaml
     with:
       release: true
-      version-operation: true
+      version-operation: finalise
       version-commit-message: "release ${version}"
 
   release:
