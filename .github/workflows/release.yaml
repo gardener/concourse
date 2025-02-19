@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: gardener/cc-utils/.github/actions/release@master
-      - with:
+        with:
           component-descriptor: ${{ needs.build.outputs.component-descriptor }}
           release-commit-objects: ${{ needs.build.outputs.version-commit-objects }}
           release-commit-digest: ${{ needs.build.outputs.version-commit-digest }}
