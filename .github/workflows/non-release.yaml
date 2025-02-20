@@ -1,6 +1,7 @@
 name: CI (non-release)
 on:
   push:
+  workflow_dispatch:
 
 jobs:
   build:
