@@ -9,7 +9,11 @@ on:
       version-operation:
         type: string
         required: false
-        default: commit-digest-as-prerelease
+        default: set-prerelease
+      version-prerelease:
+        type: string
+        required: false
+        default: '${commit_digest}'
       version-commit-message:
         type: string
     outputs:
@@ -60,6 +64,7 @@ jobs:
       uses: gardener/cc-utils/.github/actions/version@master
       with:
         version-operation: ${{ inputs.version-operation }}
+        prerelease: ${{ inputs.version-prerelease }}
 
   build:
     runs-on: ubuntu-latest

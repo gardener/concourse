@@ -7,7 +7,8 @@ jobs:
     uses: ./.github/workflows/build.yaml
     with:
       release: true
-      version-operation: finalise
+      version-operation: set-prerelease
+      version-prerelease: ''
       version-commit-message: "release ${version}"
 
   release:
