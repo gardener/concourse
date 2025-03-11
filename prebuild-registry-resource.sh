@@ -29,6 +29,7 @@ docker \
   build \
   --tag concourse-resource-registry-image:tmp \
   -f "${dockerfile}" \
+  --load \
   "${build_dir}"
 
 echo "exporting image-fs"

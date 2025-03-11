@@ -176,8 +176,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       component-descriptor: ${{ steps.gen.outputs.component-descriptor }}
-    container:
-      image: python:alpine
     permissions:
       contents: write
       id-token: write
@@ -187,43 +185,11 @@ jobs:
     steps:
       - name: install gardener-gha-libs
         uses: gardener/cc-utils/.github/actions/install-gardener-gha-libs@master
-      - name: merge ocm-resource-fragments
-        uses: actions/upload-artifact/merge@v4
+      - name: merge ocm-fragments
+        uses: ccwienk/cc-utils/.github/actions/merge-ocm-fragments
         with:
-          name: ocm-oci-resources
-          # only merge ocm-fragments emitted from ocm-oci-build-action
-          pattern: ocm-oci-build*
-          separate-directories: true
-          delete-merged: true
-      - name: download-ocm-oci-resources
-        uses: actions/download-artifact@v4
-        with:
-          name: ocm-oci-resources
-          path: ocm-oci-resources.d
-
-      - name: generate OCM Component-Descriptor
-        id: gen
-        run: |
-          env | sort
-
-          echo "base component-descriptor"
-          echo "${{ needs.base-component-descriptor.outputs.component-descriptor }}" \
-           > component-descriptor.yaml
-          cat component-descriptor.yaml
-
-          for rf in $(find ocm-oci-resources.d -type f -name ocm-resources.yaml); do
-            echo "adding ocm-resources from ${rf}"
-            cat ${rf} | gardener-ocm \
-              append resource \
-              --file component-descriptor.yaml
-          done
-
-          echo "Component-Descriptor ready to be uploaded:"
-
-          cat component-descriptor.yaml
-          echo 'component-descriptor<<EOF' >> ${GITHUB_OUTPUT}
-          cat component-descriptor.yaml
-          echo EOF >> ${GITHUB_OUTPUT}
+          component-descriptor: ${{ needs.base-component-descriptor.outputs.component-descriptor }}
+          outdir: .
 
       - name: authenticate
         uses: gardener/cc-utils/.github/actions/oci-auth@master
@@ -232,4 +198,5 @@ jobs:
           echo "uploading component-descriptor"
           gardener-ocm \
             upload \
-            --file component-descriptor.yaml
+            --file component-descriptor.yaml \
+            --blobs-dir blobs.d
