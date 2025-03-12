@@ -23,8 +23,8 @@ on:
         value: ${{ jobs.version.outputs.commit-digest }}
       effective-version:
         value: ${{ jobs.version.outputs.version }}
-      component-descriptor:
-        value: ${{ jobs.component_descriptor.outputs.component-descriptor }}
+      base-component-descriptor:
+        value: ${{ jobs.base-component-descriptor.outputs.component-descriptor }}
 
 jobs:
   params:
@@ -162,32 +162,3 @@ jobs:
             comment: |
               the repository does not contain source code, but only the
               build-description of concourse-ci
-
-  component_descriptor:
-    runs-on: ubuntu-latest
-    outputs:
-      component-descriptor: ${{ steps.gen.outputs.component-descriptor }}
-    permissions:
-      contents: write
-      id-token: write
-    needs:
-      - build
-      - base-component-descriptor
-    steps:
-      - name: install gardener-gha-libs
-        uses: gardener/cc-utils/.github/actions/install-gardener-gha-libs@master
-      - name: merge ocm-fragments
-        uses: gardener/cc-utils/.github/actions/merge-ocm-fragments@master
-        with:
-          component-descriptor: ${{ needs.base-component-descriptor.outputs.component-descriptor }}
-          outdir: .
-
-      - name: authenticate
-        uses: gardener/cc-utils/.github/actions/oci-auth@master
-      - name: upload OCM Component-Descriptor
-        run: |
-          echo "uploading component-descriptor"
-          gardener-ocm \
-            upload \
-            --file component-descriptor.yaml \
-            --blobs-dir blobs.d

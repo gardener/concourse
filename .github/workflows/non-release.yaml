@@ -11,3 +11,13 @@ jobs:
       version-operation: set-prerelease
       version-prerelease: '${commit_digest}'
       version-commit-message: "build ${version}"
+  post-build:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: component-descriptor
+        id: component-descriptor
+        uses: gardener/cc-utils/.github/actions/merge-ocm-fragments@master
+        with:
+          component-descriptor: ${{ needs.build.outputs.base-component-descriptor }}
