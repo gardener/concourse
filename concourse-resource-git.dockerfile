@@ -173,8 +173,8 @@ RUN apk --no-cache add \
   perl5 \
 &&  curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Root%20CA.crt -o \
   /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt \
-&& curl http://aia.pki.co.sap.com/aia/SAPNetCA_G2.crt -o \
-    /usr/local/share/ca-certificates/SAPNetCA_G2.crt \
+&& curl http://aia.pki.co.sap.com/aia/SAPNetCA_G2_2.crt -o \
+    /usr/local/share/ca-certificates/SAPNetCA_G2_2.crt \
 && curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2004.crt -o \
     /usr/local/share/ca-certificates/SAP_Global_Sub_CA_04.crt \
 && curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2005.crt -o \
