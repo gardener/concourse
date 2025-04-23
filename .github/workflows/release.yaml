@@ -12,25 +12,15 @@ jobs:
       version-commit-message: "release ${version}"
 
   release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
+    uses: gardener/cc-utils/.github/workflows/release.yaml@master
     needs:
       - build
-    steps:
-      - uses: actions/checkout@v4
-      - name: component-descriptor
-        id: component-descriptor
-        uses: gardener/cc-utils/.github/actions/merge-ocm-fragments@master
-        with:
-          component-descriptor: ${{ needs.build.outputs.base-component-descriptor }}
-      - uses: gardener/cc-utils/.github/actions/release@master
-        with:
-          component-descriptor: ${{ steps.component-descriptor.outputs.component-descriptor }}
-          release-commit-objects: ${{ needs.build.outputs.version-commit-objects }}
-          release-commit-digest: ${{ needs.build.outputs.version-commit-digest }}
-          next-version: bump-minor
-          next-version-commit-message: "next version: ${version}"
-          release-notes: ''
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    secrets:
+      github-app-secret-key: ${{ secrets.secrets.GARDENER_GITHUB_ACTIONS_PRIVATE_KEY }}
+
+    with:
+      component-descriptor: ${{ needs.build.outputs.base-component-descriptor }}
+      release-commit-objects: ${{ needs.build.outputs.version-commit-objects }}
+      release-commit-digest: ${{ needs.build.outputs.version-commit-digest }}
+      next-version: bump-minor
