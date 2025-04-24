@@ -2,69 +2,27 @@ name: Build
 on:
   workflow_call:
     inputs:
-      release:
-        required: false
-        type: boolean
-        default: false
-      version-operation:
+      mode:
+        required: true
         type: string
-        required: false
-        default: set-prerelease
-      version-prerelease:
-        type: string
-        required: false
-        default: '${commit_digest}'
-      version-commit-message:
-        type: string
+        default: snapshot
+        description: |
+          snapshot or release (passed to `prepare`)
     outputs:
       version-commit-objects:
-        value: ${{ jobs.version.outputs.commit-objects }}
+        value: ${{ jobs.prepare.outputs.commit-objects }}
       version-commit-digest:
-        value: ${{ jobs.version.outputs.commit-digest }}
+        value: ${{ jobs.prepare.outputs.commit-digest }}
       effective-version:
-        value: ${{ jobs.version.outputs.version }}
+        value: ${{ jobs.prepare.outputs.version }}
       base-component-descriptor:
         value: ${{ jobs.base-component-descriptor.outputs.component-descriptor }}
 
 jobs:
-  params:
-    runs-on: ubuntu-latest
-    outputs:
-      ocm_repository: ${{ steps.params.outputs.ocm_repository }}
-      oci-registry: ${{ steps.params.outputs.oci-registry }}
-      oci_platforms: ${{ steps.params.outputs.oci_platforms }}
-    steps:
-      - name: params
-        id: params
-        run: |
-          if ${{ inputs.release || false }}; then
-            ocm_repo='europe-docker.pkg.dev/gardener-project/releases'
-            oci_repo='europe-docker.pkg.dev/gardener-project/releases/cicd'
-          else
-            ocm_repo='europe-docker.pkg.dev/gardener-project/snapshots'
-            oci_repo='europe-docker.pkg.dev/gardener-project/snapshots/cicd'
-          fi
-          oci_platforms='linux/arm64,linux/amd64'
-
-          echo "ocm_repository=${ocm_repo}" >> ${GITHUB_OUTPUT}
-          echo "oci-registry=${oci_repo}" >> ${GITHUB_OUTPUT}
-          echo "oci_platforms=${oci_platforms}" >> ${GITHUB_OUTPUT}
-
-  version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      commit-message: ${{ inputs.version-commit-message }}
-      commit-objects: ${{ steps.version.outputs.commit-objects }}
-      commit-digest: ${{ steps.version.outputs.commit-digest }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: version
-      id: version
-      uses: gardener/cc-utils/.github/actions/version@master
-      with:
-        version-operation: ${{ inputs.version-operation }}
-        prerelease: ${{ inputs.version-prerelease }}
+  prepare:
+    uses: gardener/cc-utils/.github/workflows/prepare.yaml@master
+    with:
+      mode: ${{ inputs.mode }}
 
   build:
     permissions:
@@ -72,8 +30,7 @@ jobs:
       packages: write
       id-token: write
     needs:
-      - params
-      - version
+      - prepare
     strategy:
       matrix:
         args:
@@ -81,7 +38,7 @@ jobs:
             prebuild-hook: ./prebuild-registry-resource.sh
             dockerfile: concourse-worker.dockerfile
             oci-platforms: linux/amd64,linux/arm64
-            oci-repository: concourse-worker
+            oci-repository: cicd/concourse-worker
             # todo: handle build-args
             labels: |
               - name: gardener.cloud/cve-categorisation
@@ -93,7 +50,7 @@ jobs:
                   integrity_requirement: high
                   availability_requirement: high
           - name: concourse-web
-            oci-repository: concourse-web
+            oci-repository: cicd/concourse-web
             dockerfile: concourse-web.dockerfile
             oci-platforms: linux/amd64
             labels: |
@@ -106,7 +63,7 @@ jobs:
                   integrity_requirement: high
                   availability_requirement: high
           - name: concourse-resource-git
-            oci-repository: concourse-resource-git
+            oci-repository: cicd/concourse-resource-git
             dockerfile: concourse-resource-git.dockerfile
             oci-platforms: linux/amd64,linux/arm64
             labels: |
@@ -119,7 +76,7 @@ jobs:
                   integrity_requirement: high
                   availability_requirement: low
           - name: concourse-resource-time
-            oci-repository: concourse-resource-time
+            oci-repository: cicd/concourse-resource-time
             dockerfile: concourse-resource-time.dockerfile
             oci-platforms: linux/amd64,linux/arm64
             labels: |
@@ -134,22 +91,21 @@ jobs:
     uses: gardener/cc-utils/.github/workflows/oci-ocm.yaml@master
     with:
       name: ${{ matrix.args.name }}
-      oci-registry: ${{ needs.params.outputs.oci-registry }}
+      oci-registry: ${{ needs.prepare.outputs.oci-registry }}
       oci-repository: ${{ matrix.args.oci-repository }}
       oci-platforms: ${{ matrix.args.oci-platforms }}
       dockerfile: ${{ matrix.args.dockerfile }}
       prebuild-hook: ${{ matrix.args.prebuild-hook }}
-      version: ${{ needs.version.outputs.version }}
+      version: ${{ needs.prepare.outputs.version }}
 
   base-component-descriptor:
     needs:
-      - version
-      - params
+      - prepare
     uses: gardener/cc-utils/.github/workflows/base-component-descriptor.yaml@master
     with:
-      version: ${{ needs.version.outputs.version }}
-      ocm-repo: ${{ needs.params.outputs.ocm_repository }}
-      commit-digest: ${{ needs.version.outputs.commit-digest }}
+      version: ${{ needs.prepare.outputs.version }}
+      ocm-repo: ${{ needs.prepare.outputs.ocm-repository }}
+      commit-digest: ${{ needs.prepare.outputs.commit-digest }}
       labels: |
         - name: cloud.gardener.cnudie/responsibles
           value:

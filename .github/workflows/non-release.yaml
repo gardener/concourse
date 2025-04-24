@@ -7,10 +7,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
     with:
-      release: false
-      version-operation: set-prerelease
-      version-prerelease: '${commit_digest}'
-      version-commit-message: "build ${version}"
+      mode: snapshot
   post-build:
     runs-on: ubuntu-latest
     needs:

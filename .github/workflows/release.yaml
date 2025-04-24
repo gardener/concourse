@@ -6,10 +6,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
     with:
-      release: true
-      version-operation: set-prerelease
-      version-prerelease: ''
-      version-commit-message: "release ${version}"
+      mode: release
 
   release:
     uses: gardener/cc-utils/.github/workflows/release.yaml@master
