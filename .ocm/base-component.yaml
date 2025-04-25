@@ -1,0 +1,12 @@
+labels:
+  - name: cloud.gardener.cnudie/responsibles
+    value:
+      - type: githubTeam
+        teamname: gardener/ci-maintainers
+        github_hostname: github.com
+  - name: cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1
+    value:
+      policy: skip
+      comment: |
+        the repository does not contain source code, but only the
+        build-description of concourse-ci

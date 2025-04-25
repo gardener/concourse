@@ -16,7 +16,7 @@ on:
       effective-version:
         value: ${{ jobs.prepare.outputs.version }}
       base-component-descriptor:
-        value: ${{ jobs.base-component-descriptor.outputs.component-descriptor }}
+        value: ${{ jobs.prepare.outputs.component-descriptor }}
 
 jobs:
   prepare:
@@ -97,24 +97,3 @@ jobs:
       dockerfile: ${{ matrix.args.dockerfile }}
       prebuild-hook: ${{ matrix.args.prebuild-hook }}
       version: ${{ needs.prepare.outputs.version }}
-
-  base-component-descriptor:
-    needs:
-      - prepare
-    uses: gardener/cc-utils/.github/workflows/base-component-descriptor.yaml@master
-    with:
-      version: ${{ needs.prepare.outputs.version }}
-      ocm-repo: ${{ needs.prepare.outputs.ocm-repository }}
-      commit-digest: ${{ needs.prepare.outputs.commit-digest }}
-      labels: |
-        - name: cloud.gardener.cnudie/responsibles
-          value:
-            - type: githubTeam
-              teamname: gardener/ci-maintainers
-              github_hostname: github.com
-        - name: cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1
-          value:
-            policy: skip
-            comment: |
-              the repository does not contain source code, but only the
-              build-description of concourse-ci
