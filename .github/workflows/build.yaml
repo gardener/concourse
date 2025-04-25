@@ -97,3 +97,4 @@ jobs:
       dockerfile: ${{ matrix.args.dockerfile }}
       prebuild-hook: ${{ matrix.args.prebuild-hook }}
       version: ${{ needs.prepare.outputs.version }}
+      ocm-labels: ${{ matrix.args.labels }}
