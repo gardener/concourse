@@ -9,14 +9,8 @@ on:
         description: |
           snapshot or release (passed to `prepare`)
     outputs:
-      version-commit-objects:
-        value: ${{ jobs.prepare.outputs.commit-objects }}
-      version-commit-digest:
-        value: ${{ jobs.prepare.outputs.commit-digest }}
       effective-version:
         value: ${{ jobs.prepare.outputs.version }}
-      base-component-descriptor:
-        value: ${{ jobs.prepare.outputs.component-descriptor }}
 
 jobs:
   prepare:
