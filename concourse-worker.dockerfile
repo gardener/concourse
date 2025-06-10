@@ -7,7 +7,7 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version=7.12.0
+ARG concourse_version=7.13.2
 ARG guardian_commit_id=c4541e8d2645c2cd2b592a1ff053bc2e24902435
 ARG cni_plugins_version=1.6.1
 
