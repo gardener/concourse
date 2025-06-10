@@ -81,16 +81,10 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \
     dumb-init \
-    dos2unix \
 && curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Root%20CA.crt -o \
   /usr/local/share/ca-certificates/SAP_Global_Root_CA.crt \
-&& curl http://aia.pki.co.sap.com/aia/SAPNetCA_G2.crt -o \
-    /usr/local/share/ca-certificates/SAPNetCA_G2.crt \
-&& curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2004.crt -o \
-    /usr/local/share/ca-certificates/SAP_Global_Sub_CA_04.crt \
-&& curl http://aia.pki.co.sap.com/aia/SAP%20Global%20Sub%20CA%2005.crt -o \
-    /usr/local/share/ca-certificates/SAP_Global_Sub_CA_05.crt \
-&& dos2unix /etc/ssl/certs/ca-certificates.crt \
+&& curl http://aia.pki.co.sap.com/aia/SAPNetCA_G2_2.crt -o \
+    /usr/local/share/ca-certificates/SAPNetCA_G2_2.crt \
 && update-ca-certificates \
 && mkdir -p /usr/local/concourse/fly-assets \
 &&  curl -sL \
@@ -104,7 +98,6 @@ RUN apt-get update && apt-get install -y \
    -o /usr/local/concourse/fly-assets/fly-windows-amd64.zip \
 && apt-get remove -y \
   curl \
-  dos2unix \
 && apt autoremove -y \
 && apt clean
 
