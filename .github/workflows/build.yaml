@@ -15,6 +15,9 @@ on:
 jobs:
   prepare:
     uses: gardener/cc-utils/.github/workflows/prepare.yaml@master
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       mode: ${{ inputs.mode }}
 
