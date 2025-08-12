@@ -6,6 +6,11 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      pull-requests: write
     with:
       mode: snapshot
   post-build:
@@ -14,7 +19,6 @@ jobs:
       contents: read
       packages: write
       id-token: write
-      pull-requests: write
     needs:
       - build
     steps:
