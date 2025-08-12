@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-ARG registry_image_resource_version=1.13.0
+ARG registry_image_resource_version=1.13.2
 
 RUN apk add git
 RUN git clone --depth 1 --branch v${registry_image_resource_version} https://github.com/concourse/registry-image-resource.git /src/registry-image-resource

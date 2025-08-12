@@ -1,6 +1,6 @@
 FROM alpine:3 AS resource
 
-ARG git_resource_version=1.19.0
+ARG git_resource_version=1.20.0
 WORKDIR /root
 
 RUN apk --no-cache add \

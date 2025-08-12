@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-ARG time_resource_version=v1.9.0
+ARG time_resource_version=v1.10.0
 
 RUN mkdir /src
 ADD --keep-git-dir=false \
