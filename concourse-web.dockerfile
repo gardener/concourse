@@ -4,7 +4,7 @@ ARG golang_concourse_builder_image=golang:alpine
 #
 # Build the UI artefacts
 FROM debian:bookworm-slim AS yarn-builder
-ARG concourse_version=7.13.2
+ARG concourse_version=7.14.1
 
 RUN apt-get update && \
  DEBIAN_FRONTEND=noninteractive \
@@ -37,7 +37,7 @@ FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 
-ARG concourse_version=7.13.2
+ARG concourse_version=7.14.1
 ARG guardian_commit_id=c4541e8d2645c2cd2b592a1ff053bc2e24902435
 
 RUN apk add gcc git g++
@@ -60,7 +60,7 @@ RUN CGO_CFLAGS="-D_LARGEFILE64_SOURCE" \
 # Generate the final image
 FROM debian:bookworm-slim
 
-ARG concourse_version=7.13.2
+ARG concourse_version=7.14.1
 # see https://github.com/robinhuiser/concourse-arm64/tree/main/build-specs
 ARG concourse_docker_entrypoint_commit_id=ced6f3117d93121323098d094cf7ccc1776df521
 
