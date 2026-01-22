@@ -1,0 +1,13 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+aliases:
+  concourse-reviewers:
+  - 8R0WNI3
+  - ccwienk
+  - TuanAnh17N
+  - zkdev
+  concourse-approvers:
+  - 8R0WNI3
+  - ccwienk
+  - TuanAnh17N
+  - zkdev
