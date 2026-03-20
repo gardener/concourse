@@ -1,3 +1,9 @@
+**DEPRECATION NOTE**
+
+As Gardener's CICD-Infrastructure was migrated from Concourse -> GitHub-Actions (+ prow for CI),
+this repository has become obsolete. It will be archived, and no longer maintained.
+
+
 Concourse-CI Images build
 =========================
 [![REUSE status](https://api.reuse.software/badge/github.com/gardener/concourse)](https://api.reuse.software/info/github.com/gardener/concourse)
